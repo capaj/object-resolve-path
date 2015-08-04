@@ -13,7 +13,9 @@
     "string"
   ],
   "devDependencies": {
+    "benchmark": "^1.0.0",
     "chai": "^3.0.0",
+    "lodash.get": "^3.7.0",
     "mocha": "^2.2.5"
   },
   "repository": {

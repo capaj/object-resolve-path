@@ -22,10 +22,20 @@ For thorough description, check the [tests](https://github.com/capaj/object-reso
 
 ### Similar modules:
 
-https://www.npmjs.com/package/lodash.get (works for both, doesn't throw when path is not valid, object-resolve-path does)
+https://www.npmjs.com/package/lodash.get (works for both but much much slower, doesn't throw when path is not valid, object-resolve-path does)
 
 https://github.com/deoxxa/dotty (works only for dots)
 
 https://github.com/Ntran013/dot-access  (works only for dots)
 
 https://github.com/substack/js-traverse (much more complex and useful)
+
+
+## Benchmarks
+
+```
+node benchmark.js
+lodash.get x 344,457 ops/sec +4.22% (80 runs sampled)
+object-resolve-path x 27,808,336 ops/sec +3.17% (70 runs sampled)
+Fastest is object-resolve-path
+```
