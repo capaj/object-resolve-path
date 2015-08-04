@@ -36,7 +36,7 @@ describe('object-resolve-path', function() {
   });
 
   it('should be able to get a path when it contains brackets inside', function(){
-    expect(resolve(testObj, "['hy[ph]en']")).to.equal(11); //a flaw by design, we would have to parse the whole tree if we would like to properly discern these
+    expect(resolve(testObj, "['hy[ph]en']")).to.equal(11);
   });
 
   it('should throw when path is not a string', function() {
