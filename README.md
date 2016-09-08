@@ -4,13 +4,13 @@ Based on Path pseodoclass from https://github.com/Polymer/observe-js/blob/7e94bb
 
 ## Install
 ```
-npm i object-resolve-path
+npm i object-resolve-path -S
 ```
 
 ## Usage
 
 ```javascript
-var resolvePath = require('object-resolve-path');
+const resolvePath = require('object-resolve-path');
 resolvePath(someObject, 'a.b[0]');	//returns first property from b from a from someObject
 resolvePath(someObject, 'a["b-a"][0]');	//this works as well, thanks to the parser/statemachine
 ```
@@ -35,9 +35,10 @@ https://github.com/substack/js-traverse (much more complex and useful)
 
 ```
 node benchmark.js
-lodash.get x 2,088,580 ops/sec ±3.42% (74 runs sampled)
-object-resolve-path x 26,260,596 ops/sec ±3.39% (85 runs sampled)
+lodash.get x 2,253,484 ops/sec ±0.83% (94 runs sampled)
+object-resolve-path x 39,876,349 ops/sec ±0.82% (92 runs sampled)
 Fastest is object-resolve-path
+
 ```
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
