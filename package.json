@@ -20,7 +20,8 @@
     "browserify": "^14.1.0",
     "chai": "^3.5.0",
     "lodash.get": "^4.4.2",
-    "mocha": "^3.0.2"
+    "mocha": "^3.0.2",
+    "uglifyjs": "^2.4.10"
   },
   "repository": {
     "type": "git",
