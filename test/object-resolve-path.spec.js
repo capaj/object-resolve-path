@@ -1,6 +1,6 @@
 var expect = require('chai').expect;
 
-var resolve = require('../object-resolve-path');
+var resolve = require('../index');
 
 var testObj = {
   a: 'b',
