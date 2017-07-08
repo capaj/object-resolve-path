@@ -35,8 +35,8 @@ https://github.com/substack/js-traverse (much more complex and useful)
 
 ```
 node benchmark.js
-lodash.get x 2,253,484 ops/sec ±0.83% (94 runs sampled)
-object-resolve-path x 39,876,349 ops/sec ±0.82% (92 runs sampled)
+lodash.get x 2,177,426 ops/sec ±0.93% (91 runs sampled)
+object-resolve-path x 14,136,922 ops/sec ±0.61% (96 runs sampled)
 Fastest is object-resolve-path
 
 ```

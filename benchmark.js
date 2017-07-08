@@ -1,7 +1,7 @@
 var Benchmark = require('benchmark')
 var _get = require('lodash.get')
 var objectResolvePath = require('./object-resolve-path')
-var suite = new Benchmark.Suite
+var suite = new Benchmark.Suite()
 
 var testObj = {
   a: 'b',

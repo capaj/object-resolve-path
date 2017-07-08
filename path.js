@@ -1,28 +1,5 @@
 // gutted from https://github.com/Polymer/observe-js/blob/master/src/observe.js
 function noop () {}
-function detectEval () {
-  // Don't test for eval if we're running in a Chrome App environment.
-  // We check for APIs set that only exist in a Chrome App context.
-  if (typeof chrome !== 'undefined' && chrome.app && chrome.app.runtime) {
-    return false
-  }
-
-  // Firefox OS Apps do not allow eval. This feature detection is very hacky
-  // but even if some other platform adds support for this function this code
-  // will continue to work.
-  if (typeof navigator != 'undefined' && navigator.getDeviceStorage) {
-    return false
-  }
-
-  try {
-    var f = new Function('', 'return true;')
-    return f()
-  } catch (ex) {
-    return false
-  }
-}
-
-var hasEval = detectEval()
 
 function isIndex (s) {
   return +s === s >>> 0 && s !== ''
@@ -32,18 +9,20 @@ function isObject (obj) {
   return obj === Object(obj)
 }
 
-var createObject = ('__proto__' in {}) ?
-  function (obj) {
+var createObject = '__proto__' in {}
+  ? function (obj) {
     return obj
-  } :
-  function (obj) {
-    var proto = obj.__proto__
-    if (!proto)
-      return obj
+  }
+  : function (obj) {
+    var proto = obj.__proto__ // eslint-disable-line
+    if (!proto) return obj
     var newObject = Object.create(proto)
     Object.getOwnPropertyNames(obj).forEach(function (name) {
-      Object.defineProperty(newObject, name,
-        Object.getOwnPropertyDescriptor(obj, name))
+      Object.defineProperty(
+          newObject,
+          name,
+          Object.getOwnPropertyDescriptor(obj, name)
+        )
     })
     return newObject
   }
@@ -51,32 +30,37 @@ var createObject = ('__proto__' in {}) ?
 function parsePath (path) {
   var keys = []
   var index = -1
-  var c, newChar, key, type, transition, action, typeMap, mode = 'beforePath'
+  var c
+  var newChar
+  var key
+  var type
+  var transition
+  var action
+  var typeMap
+  var mode = 'beforePath'
 
   var actions = {
     push: function () {
-      if (key === undefined)
-        return
+      if (key === undefined) return
 
       keys.push(key)
       key = undefined
     },
 
     append: function () {
-      if (key === undefined)
-        key = newChar
-      else
-        key += newChar
+      if (key === undefined) key = newChar
+      else key += newChar
     }
   }
 
   function maybeUnescapeQuote () {
-    if (index >= path.length)
-      return
+    if (index >= path.length) return
 
     var nextChar = path[index + 1]
-    if ((mode == 'inSingleQuote' && nextChar == "'") ||
-      (mode == 'inDoubleQuote' && nextChar == '"')) {
+    if (
+      (mode === 'inSingleQuote' && nextChar === "'") ||
+      (mode === 'inDoubleQuote' && nextChar === '"')
+    ) {
       index++
       newChar = nextChar
       actions.append()
@@ -88,15 +72,13 @@ function parsePath (path) {
     index++
     c = path[index]
 
-    if (c == '\\' && maybeUnescapeQuote(mode))
-      continue
+    if (c === '\\' && maybeUnescapeQuote(mode)) continue
 
     type = getPathCharType(c)
     typeMap = pathStateMachine[mode]
     transition = typeMap[type] || typeMap['else'] || 'error'
 
-    if (transition == 'error')
-      return // parse error
+    if (transition === 'error') return // parse error
 
     mode = transition[0]
     action = actions[transition[1]] || noop
@@ -108,11 +90,11 @@ function parsePath (path) {
     }
   }
 
-  return // parse error
+   // parse error
 }
 
-var identStart = '[\$_a-zA-Z]'
-var identPart = '[\$_a-zA-Z0-9]'
+var identStart = '[$_a-zA-Z]'
+var identPart = '[$_a-zA-Z0-9]'
 var identRegExp = new RegExp('^' + identStart + '+' + identPart + '*' + '$')
 
 function isIdent (s) {
@@ -122,28 +104,21 @@ function isIdent (s) {
 var constructorIsPrivate = {}
 
 function Path (parts, privateToken) {
-  if (privateToken !== constructorIsPrivate)
-    throw Error('Use Path.get to retrieve path objects')
+  if (privateToken !== constructorIsPrivate) { throw Error('Use Path.get to retrieve path objects') }
 
   for (var i = 0; i < parts.length; i++) {
     this.push(String(parts[i]))
-  }
-
-  if (hasEval && this.length) {
-    this.getValueFrom = this.compiledGetValueFromFn()
   }
 }
 
 var pathCache = {}
 
 function getPath (pathString) {
-  if (pathString instanceof Path)
-    return pathString
+  if (pathString instanceof Path) return pathString
 
-  if (pathString == null || pathString.length == 0)
-    pathString = ''
+  if (pathString == null || pathString.length === 0) pathString = ''
 
-  if (typeof pathString != 'string') {
+  if (typeof pathString !== 'string') {
     if (isIndex(pathString.length)) {
       // Constructed with array-like (pre-parsed) keys
       return new Path(pathString, constructorIsPrivate)
@@ -153,14 +128,12 @@ function getPath (pathString) {
   }
 
   var path = pathCache[pathString]
-  if (path)
-    return path
+  if (path) return path
 
   var parts = parsePath(pathString)
-  if (!parts)
-    return invalidPath
+  if (!parts) return invalidPath
 
-  var path = new Path(parts, constructorIsPrivate)
+  path = new Path(parts, constructorIsPrivate)
   pathCache[pathString] = path
   return path
 }
@@ -195,8 +168,7 @@ Path.prototype = createObject({
 
   getValueFrom: function (obj, directObserver) {
     for (var i = 0; i < this.length; i++) {
-      if (obj == null)
-        return
+      if (obj == null) return
       obj = obj[this[i]]
     }
     return obj
@@ -204,46 +176,21 @@ Path.prototype = createObject({
 
   iterateObjects: function (obj, observe) {
     for (var i = 0; i < this.length; i++) {
-      if (i)
-        obj = obj[this[i - 1]]
-      if (!isObject(obj))
-        return
+      if (i) obj = obj[this[i - 1]]
+      if (!isObject(obj)) return
       observe(obj, this[i])
     }
   },
 
-  compiledGetValueFromFn: function () {
-    var str = ''
-    var pathString = 'obj'
-    str += 'if (obj != null'
-    var i = 0
-    var key
-    for (; i < (this.length - 1); i++) {
-      key = this[i]
-      pathString += isIdent(key) ? '.' + key : formatAccessor(key)
-      str += ' &&\n     ' + pathString + ' != null'
-    }
-    str += ')\n'
-
-    var key = this[i]
-    pathString += isIdent(key) ? '.' + key : formatAccessor(key)
-
-    str += '  return ' + pathString + ';\nelse\n  return undefined;'
-    return new Function('obj', str)
-  },
-
   setValueFrom: function (obj, value) {
-    if (!this.length)
-      return false
+    if (!this.length) return false
 
     for (var i = 0; i < this.length - 1; i++) {
-      if (!isObject(obj))
-        return false
+      if (!isObject(obj)) return false
       obj = obj[this[i]]
     }
 
-    if (!isObject(obj))
-      return false
+    if (!isObject(obj)) return false
 
     obj[this[i]] = value
     return true
@@ -251,110 +198,107 @@ Path.prototype = createObject({
 })
 
 function getPathCharType (char) {
-  if (char === undefined)
-    return 'eof'
+  if (char === undefined) return 'eof'
 
   var code = char.charCodeAt(0)
 
   switch (code) {
-    case 0x5B: // [
-    case 0x5D: // ]
-    case 0x2E: // .
+    case 0x5b: // [
+    case 0x5d: // ]
+    case 0x2e: // .
     case 0x22: // "
     case 0x27: // '
     case 0x30: // 0
       return char
 
-    case 0x5F: // _
+    case 0x5f: // _
     case 0x24: // $
       return 'ident'
 
     case 0x20: // Space
     case 0x09: // Tab
-    case 0x0A: // Newline
-    case 0x0D: // Return
-    case 0xA0: // No-break space
-    case 0xFEFF: // Byte Order Mark
+    case 0x0a: // Newline
+    case 0x0d: // Return
+    case 0xa0: // No-break space
+    case 0xfeff: // Byte Order Mark
     case 0x2028: // Line Separator
     case 0x2029: // Paragraph Separator
       return 'ws'
   }
 
   // a-z, A-Z
-  if ((0x61 <= code && code <= 0x7A) || (0x41 <= code && code <= 0x5A))
-    return 'ident'
+  if ((code >= 0x61 && code <= 0x7a) || (code >= 0x41 && code <= 0x5a)) { return 'ident' }
 
   // 1-9
-  if (0x31 <= code && code <= 0x39)
-    return 'number'
+  if (code >= 0x31 && code <= 0x39) return 'number'
 
   return 'else'
 }
 
 var pathStateMachine = {
-  'beforePath': {
-    'ws': ['beforePath'],
-    'ident': ['inIdent', 'append'],
+  beforePath: {
+    ws: ['beforePath'],
+    ident: ['inIdent', 'append'],
     '[': ['beforeElement'],
-    'eof': ['afterPath']
+    eof: ['afterPath']
   },
 
-  'inPath': {
-    'ws': ['inPath'],
+  inPath: {
+    ws: ['inPath'],
     '.': ['beforeIdent'],
     '[': ['beforeElement'],
-    'eof': ['afterPath']
+    eof: ['afterPath']
   },
 
-  'beforeIdent': {
-    'ws': ['beforeIdent'],
-    'ident': ['inIdent', 'append']
+  beforeIdent: {
+    ws: ['beforeIdent'],
+    ident: ['inIdent', 'append']
   },
 
-  'inIdent': {
-    'ident': ['inIdent', 'append'],
+  inIdent: {
+    ident: ['inIdent', 'append'],
     '0': ['inIdent', 'append'],
-    'number': ['inIdent', 'append'],
-    'ws': ['inPath', 'push'],
+    number: ['inIdent', 'append'],
+    ws: ['inPath', 'push'],
     '.': ['beforeIdent', 'push'],
     '[': ['beforeElement', 'push'],
-    'eof': ['afterPath', 'push']
+    eof: ['afterPath', 'push']
   },
 
-  'beforeElement': {
-    'ws': ['beforeElement'],
+  beforeElement: {
+    ws: ['beforeElement'],
     '0': ['afterZero', 'append'],
-    'number': ['inIndex', 'append'],
+    number: ['inIndex', 'append'],
     "'": ['inSingleQuote', 'append', ''],
     '"': ['inDoubleQuote', 'append', '']
   },
 
-  'afterZero': {
-    'ws': ['afterElement', 'push'],
+  afterZero: {
+    ws: ['afterElement', 'push'],
     ']': ['inPath', 'push']
   },
 
-  'inIndex': {
+  inIndex: {
     '0': ['inIndex', 'append'],
-    'number': ['inIndex', 'append'],
-    'ws': ['afterElement'],
+    number: ['inIndex', 'append'],
+    ws: ['afterElement'],
     ']': ['inPath', 'push']
   },
 
-  'inSingleQuote': {
+  inSingleQuote: {
     "'": ['afterElement'],
-    'eof': ['error'],
-    'else': ['inSingleQuote', 'append']
+    eof: ['error'],
+    else: ['inSingleQuote', 'append']
   },
 
-  'inDoubleQuote': {
+  inDoubleQuote: {
     '"': ['afterElement'],
-    'eof': ['error'],
-    'else': ['inDoubleQuote', 'append']
+    eof: ['error'],
+    else: ['inDoubleQuote', 'append']
   },
 
-  'afterElement': {
-    'ws': ['afterElement'],
+  afterElement: {
+    ws: ['afterElement'],
     ']': ['inPath', 'push']
   }
 }
