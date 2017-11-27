@@ -13,6 +13,9 @@ npm i object-resolve-path -S
 const resolvePath = require('object-resolve-path');
 resolvePath(someObject, 'a.b[0]');	//returns first property from b from a from someObject
 resolvePath(someObject, 'a["b-a"][0]');	//this works as well, thanks to the parser/statemachine
+//with variables
+const someId = 'some-id'
+resolvePath(someObject, `a.b['${someId}']`); //return key 'some-id' from the nested a.b object
 ```
 
 ## Typical usecase?
