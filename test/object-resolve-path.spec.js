@@ -7,6 +7,7 @@ var testObj = {
   'hyph"en': 10,
   "hy[ph]en": 11,
   b: {
+    'some-id': {meaning: 42},
     c: [1, 2, 3],
     d: ['h', 'ch'],
     e: [{}, {f: 'g'}],
@@ -22,8 +23,8 @@ describe('object-resolve-path', function() {
   });
 
   it('should return a property with dot and a variable', function() {
-    var variableF = 'f'
-    expect(resolve(testObj, `b.${variableF}`)).to.equal('i');
+    var someId = 'some-id'
+    expect(resolve(testObj, `b['${someId}'].meaning`)).to.equal(42);
   });
 
   it('should return a property with a bracket notation', function() {
