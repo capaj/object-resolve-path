@@ -9,7 +9,7 @@ module.exports = function (o, path) {
   if (typeof path !== 'string') {
     throw new TypeError('path must be a string')
   }
-  if (typeof o !== 'object') {
+  if (!o || typeof o !== 'object') {
     throw new TypeError('object must be passed')
   }
   var pathObj = Path.get(path)
